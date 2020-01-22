@@ -1,0 +1,12 @@
+{
+    "name": "SBS Musicbank autocomplete plugin",
+    "version": "1.0",
+    "description": "auto complete",
+    "manifest_version": 2,
+    "content_scripts": [
+        {
+          "matches": ["http://*/*"],
+          "js": ["jquery-2.2.3.min.js","jquery-ui.min.js","hangul.min.js","contentScript.js"]
+        }
+      ]
+  }
