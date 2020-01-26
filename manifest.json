@@ -13,10 +13,9 @@
     },
     "content_scripts": [
         {
-          "matches": ["http://musicbank.sbs.co.kr/mbs/sysTopmenu.do"],
+          "matches": ["http://musicbank.sbs.co.kr/mbs/main.do"],
           "js": ["jquery-2.2.3.min.js","jquery-ui.min.js","hangul.min.js","contentScript.js"],
-          "css": ["jquery-ui.min.css"],
-          "all_frames" : true
+          "css": ["jquery-ui.min.css"]
         }
       ]
   }
