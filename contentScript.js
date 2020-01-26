@@ -1,13 +1,31 @@
-$(document).ready(function(){   
+// window.onload = function() {
+// 	alert('load')
+// }
 
-    // document.getElementById('songSearchWithWorkers').addEventListener('input',(event) => {
-    //     console.log(event.target.value)
-    // })
-    const selector = '#test';
-	$( selector ).autocomplete({
+$(window).load(function(){   
+	const selector = '#sch_search_text';
+	// Althought input element is in topLevel iframe,
+	// all_frame : true option makes selector selectable.
+	// otherwise, we need to find selector in iframe.
+	const gnbWrap = '#gnbWrap';
+	const docTop = '#layout-doc';
+
+	const autocompleteMirror = $('<input type="text" id="autocompleteMirror"></input>');
+	const container = $('<div class="ui-widget-content"></div>');
+	container.append(autocompleteMirror);
+	// $(gnbWrap).append(container);
+	$('body').prepend(container);
+	console.log(autocompleteMirror)
+	container.draggable();
+	const searchURL = 'http://127.0.0.1:3000';
+	$(selector).on('input',(event) => {
+			console.log(event.target.value)
+			autocompleteMirror.val(event.target.value);
+	})
+	$(autocompleteMirror).autocomplete({
 		source: function(request,response){
-			timer.start();
-			var data = $(selector).val(); 
+			// timer.start();
+			var data = $(autocompleteMirror).val(); 
 			for ( var i = 0 ; i < data.length ; i++ ) {
 				if(Hangul.isHangul(data[i])){
 					console.log('이건 초성검색이 아닙니다');
@@ -25,12 +43,13 @@ $(document).ready(function(){
 			}
 			
 			$.ajax({
-				'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
+				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
+				'url': searchURL + '/searchSong/withWorkers/' + encodeURIComponent(request.term),
 				'type':'GET',
 				'success':function(res){
 					const {result,count} = res;
-					const elapsed = timer.end();
-					$('#result').text(`Search Success : ${count} words, ${elapsed} sec`);
+					// const elapsed = timer.end();
+					// $('#result').text(`Search Success : ${count} words, ${elapsed} sec`);
 					console.log(result)
 					response(
 							$.map(result.slice(0,20),function(item){
@@ -53,7 +72,7 @@ $(document).ready(function(){
 				resolve()
 			})
 			promise.then(function(result){
-				console.log($(selector).val());
+				console.log($(autocompleteMirror).val());
 				// submit code 넣으면 된다..검색이라든가..뭐
 			});
 		},
@@ -71,33 +90,5 @@ $(document).ready(function(){
 			 });
 		 }	
     });	
-    
-    const timer = {
-		startTime : null,
-		endTime : null,
-		runnig : false,
-		start(){
-			if(this.running) {
-				console.error('timer already started');
-				return false;
-			}
-			const time = new Date();
-			this.startTime = time.getTime();
-			this.running = true;
-		},
-		getDuration(){
-			return ((this.endTime - this.startTime ) / 1000).toFixed(5);
-		},
-		end(){
-			if(!this.running) {
-				console.error('start timer first!');
-				return false;
-			}
-			const time = new Date();
-			this.endTime = time.getTime();
-			this.running = false;
-			return this.getDuration();
-		},
-	}
 })
     

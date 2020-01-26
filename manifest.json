@@ -3,10 +3,20 @@
     "version": "1.0",
     "description": "auto complete",
     "manifest_version": 2,
+    "permissions": [
+      "tabs",
+      "webNavigation"
+    ],
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+    },
     "content_scripts": [
         {
-          "matches": ["http://*/*"],
-          "js": ["jquery-2.2.3.min.js","jquery-ui.min.js","hangul.min.js","contentScript.js"]
+          "matches": ["http://musicbank.sbs.co.kr/mbs/sysTopmenu.do"],
+          "js": ["jquery-2.2.3.min.js","jquery-ui.min.js","hangul.min.js","contentScript.js"],
+          "css": ["jquery-ui.min.css"],
+          "all_frames" : true
         }
       ]
   }
