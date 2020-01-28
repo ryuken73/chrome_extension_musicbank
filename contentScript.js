@@ -39,7 +39,7 @@ $(window).load(function(){
 	// const selector = '#sch_search_text';
 	// const selector = $('#topFrame').contents().find('#sch_search_text');
 	const selector = searchInput;
-	const searchURL = 'http://127.0.0.1:3000';
+	const searchURL = 'http://10.10.16.122:3000';
 
 	// make input element draggable
 	// https://stackoverflow.com/questions/3895552/jquery-draggable-input-elements
