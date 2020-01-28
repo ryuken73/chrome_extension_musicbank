@@ -1,6 +1,6 @@
 
-$(window).load(function(){   
-
+// $(window).load(function(){   
+(function($){
 	// Althought input element is located in topLevel iframe,
 	// "all_frame : true" option in manifest.json makes input element selectable.
 	// but, after all_frame value is setted true, the content script can access that frame element only!
@@ -39,10 +39,11 @@ $(window).load(function(){
 	// const selector = '#sch_search_text';
 	// const selector = $('#topFrame').contents().find('#sch_search_text');
 	const selector = searchInput;
-	const searchURL = 'http://127.0.0.1:3000';
+	const searchURL = 'http://10.10.16.122:3000';
 
 	// make input element draggable
 	// https://stackoverflow.com/questions/3895552/jquery-draggable-input-elements
+
 	$(".draggable").draggable({
 		start: function (event, ui) {
 			$(this).data('preventBehaviour', true);
@@ -64,17 +65,6 @@ $(window).load(function(){
 			$draggable.data("preventBehaviour", false)
 		}
 	});
-	//
-	function embedRun(fn, args){
-		const script = document.createElement("script");
-		// script.text = `(${fn.toString()})(${args});`;
-		script.text = '(' + fn.toString() + ')(' + args +  ');';
-		document.documentElement.appendChild(script);
-	}
-	function sumitSearch(){
-		console.log('search init!');
-		fncSearch();
-	}
 
 	$(selector).autocomplete({
 		source: function(request,response){
@@ -110,7 +100,7 @@ $(window).load(function(){
 						response(
 							// $.map(result.slice(0,20),function(item){
 							$.map(result.slice(0,MAX_RECORD), function(item){	
-								return{
+								return {
 									label : item.artistName + ' : '+ item.songName,
 									value : item.songName,
 									artistName : item.artistName, 
@@ -137,54 +127,28 @@ $(window).load(function(){
 			})
 			promise.then(function(result){
 				$('#topFrame').contents().find('#sch_search_text').val(ui.item.songName);
-				// submit code 넣으면 된다..검색이라든가..뭐
-				// embedRun(sumitSearch);
 				$('#topFrame').contents().find('#sch_search_text').next().trigger('click');
 			});
 		},
 		// highlight matched string
 		open: function (e, ui) {
-			var acData = $(this).data('ui-autocomplete');
-			acData
-			.menu
-			.element
-			.find('li')
-			.each(function () {
-				var me = $(this);
-				var keywords = acData.term.split(' ').join('|');
-				me.html(me.text().replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>'));
-			 });
-		 }
+			try {
+				var acData = $(this).data('ui-autocomplete');
+				acData
+				.menu
+				.element
+				.find('li')
+				.each(function () {
+					var me = $(this);
+					var keywords = acData.term.split(' ').join('|');
+					me.html(me.text().replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>'));
+				});
+			} catch (err) {
+				console.error(err);
+			}		
+		} 
 	});	
-	
-	// const timer = {
-	// 	startTime : null,
-	// 	endTime : null,
-	// 	runnig : false,
-	// 	start(){
-	// 		if(this.running) {
-	// 			console.error('timer already started');
-	// 			return false;
-	// 		}
-	// 		const time = new Date();
-	// 		this.startTime = time.getTime();
-	// 		this.running = true;
-	// 	},
-	// 	getDuration(){
-	// 		return ((this.endTime - this.startTime ) / 1000).toFixed(5);
-	// 	},
-	// 	end(){
-	// 		if(!this.running) {
-	// 			console.error('start timer first!');
-	// 			return false;
-	// 		}
-	// 		const time = new Date();
-	// 		this.endTime = time.getTime();
-	// 		this.running = false;
-	// 		return this.getDuration();
-	// 	},
-	// }
-})
+})(jQuery);
 	
 class Timer {
 	constructor(){
