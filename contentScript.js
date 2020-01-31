@@ -1,6 +1,19 @@
 
 // $(window).load(function(){   
 (function($){
+
+	// enable / disable logging 
+	// to enable console.log, set localStorage.debugLOG = true in chrome dev console.
+	const debugLog = {}
+	const ignore = () => {};
+	debugLog.log = (msg) => {
+		if(localStorage.getItem('debugLOG') === 'true') {
+		  	window.console.log(msg);
+			return
+		}
+		ignore(msg);
+	}
+
 	// Althought input element is located in topLevel iframe,
 	// "all_frame : true" option in manifest.json makes input element selectable.
 	// but, after all_frame value is setted true, the content script can access that frame element only!
@@ -13,7 +26,8 @@
 	// define css using javascript
 	const style = document.createElement('style');
 	document.head.appendChild(style);
-	const LOADING_IMG_URL = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/images/ui-anim_basic_16x16.gif';
+	// const LOADING_IMG_URL = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/images/ui-anim_basic_16x16.gif';
+	const LOADING_IMG_URL = chrome.runtime.getURL('images/loading_16.gif');
 	style.sheet.insertRule(`.ui-autocomplete-loading {background: white url(${LOADING_IMG_URL}) right center no-repeat;}`);
 	style.sheet.insertRule('.ui-autocomplete.ui-widget {font-family: Verdana,Arial,sans-serif;font-size: 12px;}');
 	style.sheet.insertRule('.ui-autocomplete {max-height: 500px; overflow-y: auto; overflow-x: hidden;')
@@ -84,6 +98,21 @@
 	// 	}
 	// });
 
+	// to enhance movement when dragging elements, mousemove events should be fired in iframe
+	function bindIFrameMousemove(iframe){
+		iframe.contentWindow.addEventListener('mousemove', function(event) {
+			var clRect = iframe.getBoundingClientRect();
+			var evt = new CustomEvent('mousemove', {bubbles: true, cancelable: false});
+	
+			evt.clientX = event.clientX + clRect.left;
+			evt.clientY = event.clientY + clRect.top;
+	
+			iframe.dispatchEvent(evt);
+		});
+	};
+	
+
+
 	const drag = {};
 	drag.app = {
 		config: {
@@ -101,7 +130,7 @@
 			this.config.cursorOffsetY = 0;
 		},
 		logicDrag: function () {
-			console.log(this.config.canDrag);
+			debugLog.log(this.config.canDrag);
 			if (this.config.canDrag) {
 				this.adjustPostion(event, this.config.targetId);
 			} else {
@@ -109,36 +138,49 @@
 			}
 		},
 		start: function () {
+
 			document.getElementById(this.config.moverId).addEventListener('mousedown', function (event) {
-				console.log(`+++++++++++++ mousedown : currentX : ${event.clientX}, currentY : ${event.clientY}`)
+				debugLog.log(`bindIFrameMousemove`)
+				bindIFrameMousemove(document.getElementById('topFrame'));
+				bindIFrameMousemove(document.getElementById('centerFrame'));
+			}.bind(this), {once:true});
+
+			document.getElementById(this.config.moverId).addEventListener('mousedown', function (event) {
+				debugLog.log(`+++++++++++++ mousedown : currentX : ${event.clientX}, currentY : ${event.clientY}`)
+				bindIFrameMousemove(document.getElementById('centerFrame').contentWindow.document.getElementsByTagName('iframe')[0]);
+				bindIFrameMousemove(document.getElementById('centerFrame').contentWindow.document.getElementsByTagName('iframe')[1]);
 				this.config.canDrag = true;
 				this.config.cursorOffsetXMover = event.clientX;
 				this.config.cursorOffsetYMover = event.clientY;
+
 			}.bind(this));
 			document.addEventListener('mousemove', function (event) {
-				console.log('+ mousemove')
+				// debugLog.log('+ mousemove')
 				this.logicDrag();
 			}.bind(this));
+			document.addEventListener('mousedown', function (event) {
+				debugLog.log('---- mousedown')
+			}.bind(this));
 			document.getElementById(this.config.moverId).addEventListener('mouseout', function (event) {
-				console.log('+++ mouseout')
+				debugLog.log('+++ mouseout')
 				this.logicDrag();
 			}.bind(this));
 			document.getElementById(this.config.moverId).addEventListener('mouseleave', function (event) {
-				console.log('+++ mouseleave');
+				debugLog.log('+++ mouseleave');
 				this.logicDrag();
 			}.bind(this));
 			document.getElementById(this.config.moverId).addEventListener('mouseenter', function (event) {
-				console.log('+++ mouseenter');
+				debugLog.log('+++ mouseenter');
 			}.bind(this));
 			document.getElementById(this.config.moverId).addEventListener('mouseup', function (event) {
-				console.log('+++++++++++++ mouseup')
+				debugLog.log('+++++++++++++ mouseup')
 				this.reset();
 			}.bind(this));
 		},
 		adjustPostion: function (event, targetId) {
-			console.log(`+++++++++++++ adjustPosition : clientX : ${event.clientX}, clientY : ${event.clientY}`)
-			console.log(`+++++++++++++ adjustPosition : cursorOffsetX : ${this.config.cursorOffsetY}, cursorOffsetX : ${this.config.cursorOffsetY}`)
-			console.log(`+++++++++++++ adjustPosition : cursorOffsetXMover : ${this.config.cursorOffsetXMover}, cursorOffsetYMover : ${this.config.cursorOffsetYMover}`)
+			debugLog.log(`+++++++++++++ adjustPosition : clientX : ${event.clientX}, clientY : ${event.clientY}`)
+			debugLog.log(`+++++++++++++ adjustPosition : cursorOffsetX : ${this.config.cursorOffsetY}, cursorOffsetX : ${this.config.cursorOffsetY}`)
+			debugLog.log(`+++++++++++++ adjustPosition : cursorOffsetXMover : ${this.config.cursorOffsetXMover}, cursorOffsetYMover : ${this.config.cursorOffsetYMover}`)
 			// calculate the new cursor position
 			this.config.cursorOffsetX = this.config.cursorOffsetXMover - event.clientX;
 			this.config.cursorOffsetY = this.config.cursorOffsetYMover - event.clientY;
@@ -208,7 +250,7 @@
 			var data = $(selector).val(); 
 			for ( var i = 0 ; i < data.length ; i++ ) {
 				if(Hangul.isHangul(data[i])){
-					console.log('이건 초성검색이 아닙니다');
+					debugLog.log('이건 초성검색이 아닙니다');
 					break;
 				}
 				if(!Hangul.isHangul(data[i])){
@@ -216,7 +258,7 @@
 					if(Hangul.isConsonant(data[i]) && !Hangul.isCho(data[i])){
 					// 그리고 자음이면서, 초성으로 쓰일수 없는 글자라면... disassemble한다.
 							var result = Hangul.disassemble(data).join('');
-							console.log(result);	
+							debugLog.log(result);	
 							$(selector).val(result);
 					}
 				}
@@ -230,7 +272,7 @@
 					const {result,count} = res;
 					const elapsed = timer.end();
 					$('#titleDiv').text('결과 : '+ count + '건, 시간 : ' + elapsed + '초');
-					// console.log(result)
+					// debugLog.log(result)
 					try {
 						response(
 							// $.map(result.slice(0,20),function(item){

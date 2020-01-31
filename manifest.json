@@ -23,7 +23,8 @@
         }
     ],
     "web_accessible_resources" : [
-      "images/*.png"
+      "images/*.png",
+      "images/*.gif"
     ],
     "content_security_policy": "script-src 'self' 'sha256-FC666qq/sDUJ5h1wAnuD99ocJuDhfA+8O4fR9EOPtvQ='; object-src 'self'"
 
