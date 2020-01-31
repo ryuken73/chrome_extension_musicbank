@@ -50,6 +50,7 @@
 	//imgTag.src = imgURL;
 	imgTag.setAttribute('src', imgURL);
 	imgTag.setAttribute('style', 'margin-left:5px');
+	imgTag.setAttribute('id', 'autocompleteMover');
 	moveDiv.append(imgTag);
 	 
 	// const selector = '#sch_search_text';
@@ -90,7 +91,7 @@
 			cursorOffsetY: 0,
 			cursorOffsetXMover : 0,
 			cursorOffsetYMover : 0,
-			targetId: 'autocomplete',
+			targetId: 'container',
 			moverId: 'autocompleteMover'
 		},
 		reset: function () {
