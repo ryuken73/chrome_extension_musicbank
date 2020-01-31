@@ -1,6 +1,6 @@
 {
     "name": "SBS Musicbank autocomplete plugin",
-    "version": "1.01",
+    "version": "1.02",
     "description": "SBS musicbank search helper - auto complete and suggestion",
     "manifest_version": 2,
     "permissions": [
@@ -21,6 +21,9 @@
           "js": ["jquery-2.2.3.min.js","jquery-ui.min.js","hangul.min.js","contentScript.js"],
           "css": ["jquery-ui.min.css"]
         }
+    ],
+    "web_accessible_resources" : [
+      "images/*.png"
     ],
     "content_security_policy": "script-src 'self' 'sha256-FC666qq/sDUJ5h1wAnuD99ocJuDhfA+8O4fR9EOPtvQ='; object-src 'self'"
 

@@ -1,0 +1,131 @@
+<html>
+    <head>
+        <script src="jquery-2.2.3.min.js"></script>
+        <script src="jquery-ui.min.js"></script>
+    </head>
+    <body>
+        <div id="autocomplete" style="font-size: small;position: fixed;top: 277px;left: 546px;display: flex;align-items:center">
+            <div id="searchResult" style="background-color: black;color: white;font-size: small;display:flex;flex-direction:column;">
+                <div id="titleDiv" style="margin: 3px;margin-left: 5px;font-size: 5px;">결과 : 162건, 시간 : 0.38600초</div>
+                <input id="autoSearchInput" type="text" onclick="this.select();" class="ui-autocomplete-input" autocomplete="off">
+            </div>    
+            <div id="autocompleteMover" style="cursor: move; border: " class="draggable ui-draggable ui-draggable-handle">
+                <img src='images/mouse-26.png' style="margin-left:5px"></img>
+            </div>
+        </div>
+    </body>
+    <script>
+        const drag = {};
+        drag.app = {
+                config: {
+                    canDrag: false,
+                    cursorOffsetX: null,
+                    cursorOffsetY: null,
+                    cursorOffsetXMover : null,
+                    cursorOffsetYMover : null,
+                    targetId: 'autocomplete',
+                    moverId: 'autocompleteMover'
+                },
+                reset: function () {
+                    this.config.canDrag = false;
+                    this.config.cursorOffsetX = null;
+                    this.config.cursorOffsetY = null;
+                },
+                logicDrag: function () {
+                    console.log(this.config.canDrag);
+                    if (this.config.canDrag) {
+                        this.adjustPostion(event, this.config.targetId);
+                    } else {
+                        this.reset();
+                    }
+                },
+                start: function () {
+                    document.getElementById(this.config.moverId).addEventListener('mousedown', function (event) {
+                        console.log(`+++++++++++++ mousedown : currentX : ${event.offsetX}, currentY : ${event.offsetY}`)
+                        this.config.canDrag = true;
+                        this.config.cursorOffsetXMover = event.offsetX;
+                        this.config.cursorOffsetYMover = event.offsetY;
+                    }.bind(this));
+                    document.addEventListener('mousemove', function (event) {
+                        console.log('+ mousemove')
+                        this.logicDrag();
+                    }.bind(this));
+                    document.getElementById(this.config.moverId).addEventListener('mouseout', function (event) {
+                        console.log('+++ mouseout')
+                        this.logicDrag();
+                    }.bind(this));
+                    document.getElementById(this.config.moverId).addEventListener('mouseleave', function (event) {
+                        console.log('+++ mouseleave');
+                        this.logicDrag();
+                    }.bind(this));
+                    document.getElementById(this.config.moverId).addEventListener('mouseenter', function (event) {
+                        console.log('+++ mouseenter');
+                    }.bind(this));
+                    document.getElementById(this.config.moverId).addEventListener('mouseup', function (event) {
+                        console.log('+++++++++++++ mouseup')
+                        this.reset();
+                    }.bind(this));
+                },
+                adjustPostion: function (event, targetId) {
+                    console.log(`+++++++++++++ adjustPosition : pageX : ${event.pageX}, pageY : ${event.pageY}`)
+			        console.log(`+++++++++++++ adjustPosition : cursorOffsetX : ${this.config.cursorOffsetY}, cursorOffsetX : ${this.config.cursorOffsetY}`)
+                    // calculate the new cursor position
+                    this.cursorOffsetX = this.cursorOffsetXMover - e.clientX;
+                    this.cursorOffsetY = this.cursorOffsetYMover - e.clientY;
+                    this.cursorOffsetXMover = e.clientX;
+                    this.cursorOffsetYMover = e.clientY;
+
+                    var elm = document.getElementById(targetId);
+                    // elm.style.left = (event.pageX - this.config.cursorOffsetX) + 'px';
+                    // elm.style.top = (event.pageY - this.config.cursorOffsetY) + 'px';
+                    elm.style.top = (elm.offsetTop - this.config.cursorOffsetY) + 'px';     
+                    elm.style.left = (elm.offsetLeft - this.config.cursorOffsetX) + 'px';
+               
+                }
+
+            };
+
+            drag.app.start();
+        // dragElement(document.getElementById("autocomplete"));
+        // function dragElement(elmnt) {
+        //     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        //     if (document.getElementById(elmnt.id + "Mover")) {
+        //         // if present, the header is where you move the DIV from:
+        //         document.getElementById(elmnt.id + "Mover").onmousedown = dragMouseDown;
+        //     } else {
+        //         // otherwise, move the DIV from anywhere inside the DIV:
+        //         elmnt.onmousedown = dragMouseDown;
+        //     }
+ 
+        //     function dragMouseDown(e) {
+        //         e = e || window.event;
+        //         e.preventDefault();
+        //         // get the mouse cursor position at startup:
+        //         pos3 = e.clientX;
+        //         pos4 = e.clientY;
+        //         document.onmouseup = closeDragElement;
+        //         // call a function whenever the cursor moves:
+        //         document.onmousemove = elementDrag;
+        //     }
+
+        //     function elementDrag(e) {
+        //         e = e || window.event;
+        //         e.preventDefault();
+        //         // calculate the new cursor position:
+        //         pos1 = pos3 - e.clientX;
+        //         pos2 = pos4 - e.clientY;
+        //         pos3 = e.clientX;
+        //         pos4 = e.clientY;
+        //         // set the element's new position:
+        //         elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        //         elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        //     }
+
+        //     function closeDragElement() {
+        //         // stop moving when mouse button is released:
+        //         document.onmouseup = null;
+        //         document.onmousemove = null;
+        //     }
+        // }
+    </script>
+</html>

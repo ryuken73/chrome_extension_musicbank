@@ -19,22 +19,38 @@
 	style.sheet.insertRule('.ui-autocomplete {max-height: 500px; overflow-y: auto; overflow-x: hidden;')
 	//
 
-	const fixedDiv = document.createElement('div');
-	fixedDiv.setAttribute('id', 'searchResult');
-	fixedDiv.setAttribute("style", "position:fixed;top: 10px;left: 286px;background-color: black;color: white;font-size: small;");
-	fixedDiv.setAttribute("class", "draggable");
-	document.body.appendChild(fixedDiv)
+	const containerDiv = document.createElement('div');
+	containerDiv.setAttribute('id', 'container');
+	containerDiv.setAttribute('style', 'font-size: small;position: fixed;top: 6px;left: 689px;display: flex;align-items:center');
+	document.body.appendChild(containerDiv);
+
+	const contentDiv = document.createElement('div');
+	contentDiv.setAttribute('id', 'searchResult');
+	contentDiv.setAttribute("style", "background-color: black;color: white;font-size: small;display:flex;flex-direction:column;");
+	containerDiv.appendChild(contentDiv);
+	
 	const titleDiv = document.createElement('div');
 	titleDiv.setAttribute('id', 'titleDiv');
 	titleDiv.setAttribute("style","margin: 3px;margin-left: 5px;font-size: 5px;");
 	titleDiv.innerText = '검색 자동완성';
-	fixedDiv.appendChild(titleDiv);
-
+	contentDiv.appendChild(titleDiv);
 	const searchInput = document.createElement('input');
 	searchInput.setAttribute('id', 'autoSearchInput');
 	searchInput.setAttribute('type', 'text');
 	searchInput.setAttribute('onClick', 'this.select();');
-	fixedDiv.appendChild(searchInput);
+	contentDiv.appendChild(searchInput);
+
+	const moveDiv = document.createElement('div');
+	moveDiv.setAttribute('id', 'containerMover');
+	moveDiv.setAttribute('style', 'cursor: move;');
+	containerDiv.appendChild(moveDiv);
+
+	const imgTag = document.createElement('img');
+	const imgURL = chrome.runtime.getURL('images/mouse-26.png');
+	//imgTag.src = imgURL;
+	imgTag.setAttribute('src', imgURL);
+	imgTag.setAttribute('style', 'margin-left:5px');
+	moveDiv.append(imgTag);
 	 
 	// const selector = '#sch_search_text';
 	// const selector = $('#topFrame').contents().find('#sch_search_text');
@@ -44,27 +60,130 @@
 	// make input element draggable
 	// https://stackoverflow.com/questions/3895552/jquery-draggable-input-elements
 
-	$(".draggable").draggable({
-		start: function (event, ui) {
-			$(this).data('preventBehaviour', true);
+	// $(".draggable").draggable({
+	// 	start: function (event, ui) {
+	// 		$(this).data('preventBehaviour', true);
+	// 	}
+	// });
+	// $(".draggable").find(":input").on('mousedown', function (e) {
+	// 	var mdown = new MouseEvent("mousedown", {
+	// 		screenX: e.screenX,
+	// 		screenY: e.screenY,
+	// 		clientX: e.clientX,
+	// 		clientY: e.clientY,
+	// 		view: window
+	// 	});
+	// 	$(this).closest('.draggable')[0].dispatchEvent(mdown);
+	// }).on('click', function (e) {
+	// 	var $draggable = $(this).closest('.draggable');
+	// 	if ($draggable.data("preventBehaviour")) {
+	// 		e.preventDefault();
+	// 		$draggable.data("preventBehaviour", false)
+	// 	}
+	// });
+
+	drag.app = {
+		config: {
+			canDrag: false,
+			cursorOffsetX: null,
+			cursorOffsetY: null,
+			targetId: 'autocompleteMover'
+		},
+		reset: function () {
+			this.config.canDrag = false;
+			this.config.cursorOffsetX = null;
+			this.config.cursorOffsetY = null;
+		},
+		logicDrag: function () {
+			console.log(this.config.canDrag);
+			if (this.config.canDrag) {
+				this.adjustPostion(event, this.config.targetId);
+			} else {
+				this.reset();
+			}
+		},
+		start: function () {
+			document.getElementById(this.config.targetId).addEventListener('mousedown', function (event) {
+				console.log(`+++++++++++++ mousedown : currentX : ${event.offsetX}, currentY : ${event.offsetY}`)
+				this.config.canDrag = true;
+				this.config.cursorOffsetX = event.offsetX;
+				this.config.cursorOffsetY = event.offsetY;
+			}.bind(this));
+			document.addEventListener('mousemove', function (event) {
+				console.log('+ mousemove')
+				this.logicDrag();
+			}.bind(this));
+			document.getElementById(this.config.targetId).addEventListener('mouseout', function (event) {
+				console.log('+++ mouseout')
+				this.logicDrag();
+			}.bind(this));
+			document.getElementById(this.config.targetId).addEventListener('mouseleave', function (event) {
+				console.log('+++ mouseleave');
+				this.logicDrag();
+			}.bind(this));
+			document.getElementById(this.config.targetId).addEventListener('mouseenter', function (event) {
+				console.log('+++ mouseenter');
+			}.bind(this));
+			document.getElementById(this.config.targetId).addEventListener('mouseup', function (event) {
+				console.log('+++++++++++++ mouseup')
+				this.reset();
+			}.bind(this));
+		},
+		adjustPostion: function (event, targetId) {
+			console.log(`+++++++++++++ adjustPosition : pageX : ${event.pageX}, pageY : ${event.pageX}`)
+			console.log(`+++++++++++++ adjustPosition : cursorOffsetX : ${this.config.cursorOffsetX}, cursorOffsetX : ${this.config.cursorOffsetX}`)
+			var elm = document.getElementById(targetId);
+			elm.style.left = (event.pageX - this.config.cursorOffsetX) + 'px';
+			elm.style.top = (event.pageY - this.config.cursorOffsetY) + 'px';
 		}
-	});
-	$(".draggable").find(":input").on('mousedown', function (e) {
-		var mdown = new MouseEvent("mousedown", {
-			screenX: e.screenX,
-			screenY: e.screenY,
-			clientX: e.clientX,
-			clientY: e.clientY,
-			view: window
-		});
-		$(this).closest('.draggable')[0].dispatchEvent(mdown);
-	}).on('click', function (e) {
-		var $draggable = $(this).closest('.draggable');
-		if ($draggable.data("preventBehaviour")) {
-			e.preventDefault();
-			$draggable.data("preventBehaviour", false)
-		}
-	});
+
+	};
+
+	drag.app.start();
+
+	// https://www.w3schools.com/howto/howto_js_draggable.asp
+
+	// dragElement(document.getElementById("container"));
+	// function dragElement(elmnt) {
+	// 	var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+	// 	if (document.getElementById(elmnt.id + "Mover")) {
+	// 		// if present, the header is where you move the DIV from:
+	// 		document.getElementById(elmnt.id + "Mover").onmousedown = dragMouseDown;
+	// 	} else {
+	// 		// otherwise, move the DIV from anywhere inside the DIV:
+	// 		elmnt.onmousedown = dragMouseDown;
+	// 	}
+
+	// 	function dragMouseDown(e) {
+	// 		e = e || window.event;
+	// 		e.preventDefault();
+	// 		// get the mouse cursor position at startup:
+	// 		pos3 = e.clientX;
+	// 		pos4 = e.clientY;
+	// 		document.onmouseup = closeDragElement;
+	// 		// call a function whenever the cursor moves:
+	// 		document.onmousemove = elementDrag;
+	// 	}
+
+	// 	function elementDrag(e) {
+	// 		e = e || window.event;
+	// 		e.preventDefault();
+	// 		// calculate the new cursor position:
+	// 		pos1 = pos3 - e.clientX;
+	// 		pos2 = pos4 - e.clientY;
+	// 		pos3 = e.clientX;
+	// 		pos4 = e.clientY;
+	// 		// set the element's new position:
+	// 		elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+	// 		elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+	// 	}
+
+	// 	function closeDragElement() {
+	// 		// stop moving when mouse button is released:
+	// 		document.onmouseup = null;
+	// 		document.onmousemove = null;
+	// 	}
+	// }
 
 	$(selector).autocomplete({
 		source: function(request,response){
