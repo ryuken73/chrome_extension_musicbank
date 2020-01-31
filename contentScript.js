@@ -51,6 +51,7 @@
 	imgTag.setAttribute('src', imgURL);
 	imgTag.setAttribute('style', 'margin-left:5px');
 	imgTag.setAttribute('id', 'autocompleteMover');
+	imgTag.setAttribute('draggable', false);
 	moveDiv.append(imgTag);
 	 
 	// const selector = '#sch_search_text';
