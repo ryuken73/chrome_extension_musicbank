@@ -19,17 +19,17 @@
         drag.app = {
                 config: {
                     canDrag: false,
-                    cursorOffsetX: null,
-                    cursorOffsetY: null,
-                    cursorOffsetXMover : null,
-                    cursorOffsetYMover : null,
+                    cursorOffsetX: 0,
+                    cursorOffsetY: 0,
+                    cursorOffsetXMover : 0,
+                    cursorOffsetYMover : 0,
                     targetId: 'autocomplete',
                     moverId: 'autocompleteMover'
                 },
                 reset: function () {
                     this.config.canDrag = false;
-                    this.config.cursorOffsetX = null;
-                    this.config.cursorOffsetY = null;
+                    this.config.cursorOffsetX = 0;
+                    this.config.cursorOffsetY = 0;
                 },
                 logicDrag: function () {
                     console.log(this.config.canDrag);
@@ -41,10 +41,10 @@
                 },
                 start: function () {
                     document.getElementById(this.config.moverId).addEventListener('mousedown', function (event) {
-                        console.log(`+++++++++++++ mousedown : currentX : ${event.offsetX}, currentY : ${event.offsetY}`)
+                        console.log(`+++++++++++++ mousedown : currentX : ${event.clientX}, currentY : ${event.clientY}`)
                         this.config.canDrag = true;
-                        this.config.cursorOffsetXMover = event.offsetX;
-                        this.config.cursorOffsetYMover = event.offsetY;
+                        this.config.cursorOffsetXMover = event.clientX;
+                        this.config.cursorOffsetYMover = event.clientY;
                     }.bind(this));
                     document.addEventListener('mousemove', function (event) {
                         console.log('+ mousemove')
@@ -67,13 +67,14 @@
                     }.bind(this));
                 },
                 adjustPostion: function (event, targetId) {
-                    console.log(`+++++++++++++ adjustPosition : pageX : ${event.pageX}, pageY : ${event.pageY}`)
+                    console.log(`+++++++++++++ adjustPosition : clientX : ${event.clientX}, clientY : ${event.clientY}`)
 			        console.log(`+++++++++++++ adjustPosition : cursorOffsetX : ${this.config.cursorOffsetY}, cursorOffsetX : ${this.config.cursorOffsetY}`)
+			        console.log(`+++++++++++++ adjustPosition : cursorOffsetXMover : ${this.config.cursorOffsetXMover}, cursorOffsetYMover : ${this.config.cursorOffsetYMover}`)
                     // calculate the new cursor position
-                    this.cursorOffsetX = this.cursorOffsetXMover - e.clientX;
-                    this.cursorOffsetY = this.cursorOffsetYMover - e.clientY;
-                    this.cursorOffsetXMover = e.clientX;
-                    this.cursorOffsetYMover = e.clientY;
+                    this.config.cursorOffsetX = this.config.cursorOffsetXMover - event.clientX;
+                    this.config.cursorOffsetY = this.config.cursorOffsetYMover - event.clientY;
+                    this.config.cursorOffsetXMover = event.clientX;
+                    this.config.cursorOffsetYMover = event.clientY;
 
                     var elm = document.getElementById(targetId);
                     // elm.style.left = (event.pageX - this.config.cursorOffsetX) + 'px';

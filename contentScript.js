@@ -82,17 +82,21 @@
 	// 	}
 	// });
 
+	const drag = {};
 	drag.app = {
 		config: {
 			canDrag: false,
-			cursorOffsetX: null,
-			cursorOffsetY: null,
-			targetId: 'autocompleteMover'
+			cursorOffsetX: 0,
+			cursorOffsetY: 0,
+			cursorOffsetXMover : 0,
+			cursorOffsetYMover : 0,
+			targetId: 'autocomplete',
+			moverId: 'autocompleteMover'
 		},
 		reset: function () {
 			this.config.canDrag = false;
-			this.config.cursorOffsetX = null;
-			this.config.cursorOffsetY = null;
+			this.config.cursorOffsetX = 0;
+			this.config.cursorOffsetY = 0;
 		},
 		logicDrag: function () {
 			console.log(this.config.canDrag);
@@ -103,38 +107,48 @@
 			}
 		},
 		start: function () {
-			document.getElementById(this.config.targetId).addEventListener('mousedown', function (event) {
-				console.log(`+++++++++++++ mousedown : currentX : ${event.offsetX}, currentY : ${event.offsetY}`)
+			document.getElementById(this.config.moverId).addEventListener('mousedown', function (event) {
+				console.log(`+++++++++++++ mousedown : currentX : ${event.clientX}, currentY : ${event.clientY}`)
 				this.config.canDrag = true;
-				this.config.cursorOffsetX = event.offsetX;
-				this.config.cursorOffsetY = event.offsetY;
+				this.config.cursorOffsetXMover = event.clientX;
+				this.config.cursorOffsetYMover = event.clientY;
 			}.bind(this));
 			document.addEventListener('mousemove', function (event) {
 				console.log('+ mousemove')
 				this.logicDrag();
 			}.bind(this));
-			document.getElementById(this.config.targetId).addEventListener('mouseout', function (event) {
+			document.getElementById(this.config.moverId).addEventListener('mouseout', function (event) {
 				console.log('+++ mouseout')
 				this.logicDrag();
 			}.bind(this));
-			document.getElementById(this.config.targetId).addEventListener('mouseleave', function (event) {
+			document.getElementById(this.config.moverId).addEventListener('mouseleave', function (event) {
 				console.log('+++ mouseleave');
 				this.logicDrag();
 			}.bind(this));
-			document.getElementById(this.config.targetId).addEventListener('mouseenter', function (event) {
+			document.getElementById(this.config.moverId).addEventListener('mouseenter', function (event) {
 				console.log('+++ mouseenter');
 			}.bind(this));
-			document.getElementById(this.config.targetId).addEventListener('mouseup', function (event) {
+			document.getElementById(this.config.moverId).addEventListener('mouseup', function (event) {
 				console.log('+++++++++++++ mouseup')
 				this.reset();
 			}.bind(this));
 		},
 		adjustPostion: function (event, targetId) {
-			console.log(`+++++++++++++ adjustPosition : pageX : ${event.pageX}, pageY : ${event.pageX}`)
-			console.log(`+++++++++++++ adjustPosition : cursorOffsetX : ${this.config.cursorOffsetX}, cursorOffsetX : ${this.config.cursorOffsetX}`)
+			console.log(`+++++++++++++ adjustPosition : clientX : ${event.clientX}, clientY : ${event.clientY}`)
+			console.log(`+++++++++++++ adjustPosition : cursorOffsetX : ${this.config.cursorOffsetY}, cursorOffsetX : ${this.config.cursorOffsetY}`)
+			console.log(`+++++++++++++ adjustPosition : cursorOffsetXMover : ${this.config.cursorOffsetXMover}, cursorOffsetYMover : ${this.config.cursorOffsetYMover}`)
+			// calculate the new cursor position
+			this.config.cursorOffsetX = this.config.cursorOffsetXMover - event.clientX;
+			this.config.cursorOffsetY = this.config.cursorOffsetYMover - event.clientY;
+			this.config.cursorOffsetXMover = event.clientX;
+			this.config.cursorOffsetYMover = event.clientY;
+
 			var elm = document.getElementById(targetId);
-			elm.style.left = (event.pageX - this.config.cursorOffsetX) + 'px';
-			elm.style.top = (event.pageY - this.config.cursorOffsetY) + 'px';
+			// elm.style.left = (event.pageX - this.config.cursorOffsetX) + 'px';
+			// elm.style.top = (event.pageY - this.config.cursorOffsetY) + 'px';
+			elm.style.top = (elm.offsetTop - this.config.cursorOffsetY) + 'px';     
+			elm.style.left = (elm.offsetLeft - this.config.cursorOffsetX) + 'px';
+	   
 		}
 
 	};
