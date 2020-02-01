@@ -6,14 +6,15 @@
     "permissions": [
       "tabs",
       "webNavigation",
-      "declarativeContent"
+      "declarativeContent",
+      "storage"
     ],
     "background": {
       "scripts": ["background.js"],
       "persistent": false
     },
     "page_action" : {
-      "default_popup" : "popup.html"
+      "default_popup" : "index.html"
     },
     "content_scripts": [
         {

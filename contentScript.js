@@ -1,6 +1,6 @@
 
 // $(window).load(function(){   
-(function($){
+(async function($){
 
 	// enable / disable logging 
 	// to enable console.log, set localStorage.debugLOG = true in chrome dev console.
@@ -14,8 +14,30 @@
 		ignore(msg);
 	}
 
+	// initialize constant from chrome.storage.local API
+	const LOCAL_STORAGE_KEY = 'MBK_SEARCH_OPTIONS';
+	const DEFAULT_CONSTANTS = {
+		address : 'https://10.10.16.122:3000',
+		maxResult : 100,
+		minWord : 2
+	};
+	const CONSTANTS = await getLocalStorage(LOCAL_STORAGE_KEY) || DEFAULT_CONSTANTS;
+	console.log(CONSTANTS);
+
+	// dynamic update CONSTANTS value
+	chrome.storage.onChanged.addListener((changes, namespace) => {
+		// namespaces = local or sync ()
+		// changes = {MBK_SEARCH_OPTIONS: {newValue:{}, oldValue:{}}
+		if(changes[LOCAL_STORAGE_KEY]){
+			const {address, maxResult, minWord} = changes[LOCAL_STORAGE_KEY].newValue;
+			CONSTANTS.address = address;
+			CONSTANTS.maxResult = maxResult;
+			CONSTANTS.minWord = minWord;
+			console.log('CONSTANT changed : ', CONSTANTS)
+		}
+    });
 	// max display records
-	const MAX_RECORD = 500; // need get from local storage
+	// const MAX_RECORD = 500; // need get from local storage
 
 	// draw UI and get autocomplete input element
     const searchInput = makeUI();
@@ -32,7 +54,16 @@
 		source: function(request,response){
 			const timer = new Timer();
 			timer.start();
-			var data = $(selector).val(); 
+			// var data = $(selector).val(); 
+			// remove empty space of string especially on starting position
+			var data = $(selector).val().replace(/^\s+/, ""); 
+			console.log(data.length)
+			if(data.length === 0){
+				// response([{label:null, value:null, artistName:null, songName:null}]);
+				response();
+				timer.end();
+				return;
+			} 
 			for ( var i = 0 ; i < data.length ; i++ ) {
 				if(Hangul.isHangul(data[i])){
 					debugLog.log('이건 초성검색이 아닙니다');
@@ -53,7 +84,8 @@
 				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
 				'url': searchURL + '/searchSong/withWorkers/' + encodeURIComponent(request.term),
 				'type':'GET',
-				'success':function(res){
+				'timeout': 5000,
+				'success': function(res){
 					const {result,count} = res;
 					const elapsed = timer.end();
 					$('#titleDiv').text('결과 : '+ count + '건, 시간 : ' + elapsed + '초');
@@ -61,7 +93,7 @@
 					try {
 						response(
 							// $.map(result.slice(0,20),function(item){
-							$.map(result.slice(0,MAX_RECORD), function(item){	
+							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
 								return {
 									label : item.artistName + ' : '+ item.songName,
 									value : item.songName,
@@ -75,6 +107,10 @@
 						console.error(err);
 						response([{label:null, value:null, artistName:null, songName:null}]);
 					}	
+				},
+				'error': (xhrObj, errString, errStatus) => {
+					console.error(errString);
+					response();
 				}	 	
 				
 			});
@@ -277,6 +313,24 @@
 	};
 
 })(jQuery);
+
+// get localStorage function
+function getLocalStorage(key) {
+	return new Promise((resolve, reject) => {
+		try {
+			chrome.storage.local.get(key, results => {
+				if(results) {
+					resolve(results);
+					return
+				}
+				resolve(null);
+			})
+		} catch (err){
+			console.error(err);
+			reject(err);
+		}
+	})
+}
 
 // define Timer class definition	
 class Timer {
