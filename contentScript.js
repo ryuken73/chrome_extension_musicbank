@@ -24,18 +24,8 @@
 	const CONSTANTS = await getLocalStorage(LOCAL_STORAGE_KEY) || DEFAULT_CONSTANTS;
 	console.log(CONSTANTS);
 
-	// dynamic update CONSTANTS value
-	chrome.storage.onChanged.addListener((changes, namespace) => {
-		// namespaces = local or sync ()
-		// changes = {MBK_SEARCH_OPTIONS: {newValue:{}, oldValue:{}}
-		if(changes[LOCAL_STORAGE_KEY]){
-			const {address, maxResult, minWord} = changes[LOCAL_STORAGE_KEY].newValue;
-			CONSTANTS.address = address;
-			CONSTANTS.maxResult = maxResult;
-			CONSTANTS.minWord = minWord;
-			console.log('CONSTANT changed : ', CONSTANTS)
-		}
-    });
+
+	
 	// max display records
 	// const MAX_RECORD = 500; // need get from local storage
 
@@ -48,17 +38,37 @@
 
 	// start : main logic for autocomplete	
 	const selector = searchInput;
-	const searchURL = 'http://10.10.16.122:3000';
+	// const searchURL = 'http://10.10.16.122:3000';
+
+	// dynamic update CONSTANTS value
+	chrome.storage.onChanged.addListener((changes, namespace) => {
+		// namespaces = local or sync ()
+		// changes = {MBK_SEARCH_OPTIONS: {newValue:{}, oldValue:{}}
+		if(changes[LOCAL_STORAGE_KEY]){
+			const {address, maxResult, minWord, delay, timeout} = changes[LOCAL_STORAGE_KEY].newValue;
+			CONSTANTS.address = address;
+			CONSTANTS.maxResult = maxResult;
+			CONSTANTS.minWord = minWord;
+			CONSTANTS.delay = delay;
+			CONSTANTS.timeout = timeout;			
+			console.log('CONSTANT changed : ', CONSTANTS)
+
+			// dynamically change autocomplete delay value
+			$(selector).autocomplete( "option", "delay", CONSTANTS.delay );
+		}
+	});
 
 	$(selector).autocomplete({
+		delay: CONSTANTS.delay,
 		source: function(request,response){
 			const timer = new Timer();
 			timer.start();
 			// var data = $(selector).val(); 
-			// remove empty space of string especially on starting position
+			// remove empty space of string expecially on starting position
 			var data = $(selector).val().replace(/^\s+/, ""); 
 			console.log(data.length)
-			if(data.length === 0){
+			// if data.length < CONSTANTS.minWord pass
+			if(data.length < CONSTANTS.minWord){
 				// response([{label:null, value:null, artistName:null, songName:null}]);
 				response();
 				timer.end();
@@ -82,9 +92,9 @@
 			
 			$.ajax({
 				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
-				'url': searchURL + '/searchSong/withWorkers/' + encodeURIComponent(request.term),
+				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term),
 				'type':'GET',
-				'timeout': 5000,
+				'timeout': CONSTANTS.timeout,
 				'success': function(res){
 					const {result,count} = res;
 					const elapsed = timer.end();
@@ -104,12 +114,12 @@
 
 						);		
 					} catch (err) {
-						console.error(err);
+						console.log(err);
 						response([{label:null, value:null, artistName:null, songName:null}]);
 					}	
 				},
 				'error': (xhrObj, errString, errStatus) => {
-					console.error(errString);
+					console.log(errString);
 					response();
 				}	 	
 				
@@ -148,7 +158,7 @@
 					me.html(me.text().replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>'));
 				});
 			} catch (err) {
-				console.error(err);
+				console.log(err);
 			}		
 		} 
 	});	
@@ -320,13 +330,13 @@ function getLocalStorage(key) {
 		try {
 			chrome.storage.local.get(key, results => {
 				if(results) {
-					resolve(results);
+					resolve(results[key]);
 					return
 				}
 				resolve(null);
 			})
 		} catch (err){
-			console.error(err);
+			console.log(err);
 			reject(err);
 		}
 	})
@@ -341,7 +351,7 @@ class Timer {
 	}
 	start = () => {
 		if(this.running) {
-				console.error('timer already started');
+				console.log('timer already started');
 				return false;
 		}
 		const time = new Date();
@@ -353,7 +363,7 @@ class Timer {
 	}
 	end = () => {
 		if(!this.running) {
-			console.error('start timer first!');
+			console.log('start timer first!');
 			return false;
 		}
 		const time = new Date();
