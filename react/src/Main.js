@@ -12,7 +12,8 @@ const useStyle = makeStyles({
     title : {
         backgroundColor: grey[900],
         color: "white",
-        display : 'flex'
+        display : 'flex',
+        alignItems : 'center'
     },
     textBox : {
         backgroundColor: grey[800],
@@ -30,7 +31,7 @@ function Main() {
 
   const classes = useStyle();
   const defaults = {
-    address : 'https://10.10.16.122:3000',
+    address : 'http://10.10.16.122:3000',
     maxResult : 500,
     minWord : 2,
     delay : 500,
@@ -103,7 +104,7 @@ function Main() {
   return (
       <Container maxWidth="sm">
         <Box p={1} className={classes.title} >
-            <Typography variant="h4">
+            <Typography style={{margin:'5px'}} variant="h4">
                 옵션
             </Typography>
             <Button style={{marginLeft:'auto'}} variant="contained" onClick={handleInitClick}>초기화</Button>   
@@ -113,7 +114,7 @@ function Main() {
         </Box>
         <Box p={1} className={classes.textBox}>
             <TextField value={maxResult} margin='dense' onChange={handleChangeValue('maxResult')}  label="최대 결과갯수"/>
-            <TextField value={minWord} margin='dense' onChange={handleChangeValue('minWord')}  label="최소 검색단어수"/>
+            <TextField value={minWord} margin='dense' onChange={handleChangeValue('minWord')}  label="검색요청 최소단어수"/>
         </Box>
         <Box p={1} className={classes.textBox}>
             <TextField value={delay} margin='dense' onChange={handleChangeValue('delay')} label="자동완성 지연(ms)"/>
