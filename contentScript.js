@@ -59,15 +59,15 @@
 		}
 	});
 
+	let userId = null;
+
 	$(selector).autocomplete({
 		delay: CONSTANTS.delay,
 		source: function(request,response){
 			const timer = new Timer();
 			timer.start();
-			// var data = $(selector).val(); 
 			// remove empty space of string expecially on starting position
 			var data = $(selector).val().replace(/^\s+/, ""); 
-			// console.log(data.length)
 			// if data.length < CONSTANTS.minWord pass
 			if(data.length < CONSTANTS.minWord){
 				// response([{label:null, value:null, artistName:null, songName:null}]);
@@ -91,10 +91,20 @@
 					}
 				}
 			}
-			
+			try {
+				userId = userId === null ? document.getElementById('topFrame').contentWindow.document.
+										getElementById('topGnbWrap').lastElementChild.lastElementChild.
+										children[0].innerText 
+										: userId;
+				console.log(userId);
+			} catch(err) {
+				console.log(err);
+				userId = 'none';
+			}
+
 			$.ajax({
 				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
-				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term),
+				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term) + '?' + userId,
 				'type':'GET',
 				'timeout': CONSTANTS.timeout,
 				'success': function(res){
