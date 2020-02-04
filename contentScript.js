@@ -104,7 +104,7 @@
 
 			$.ajax({
 				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
-				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term) + '?' + userId,
+				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term) + '?userId=' + userId,
 				'type':'GET',
 				'timeout': CONSTANTS.timeout,
 				'success': function(res){
