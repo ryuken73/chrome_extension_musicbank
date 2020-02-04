@@ -44,6 +44,7 @@
 	chrome.storage.onChanged.addListener((changes, namespace) => {
 		// namespaces = local or sync ()
 		// changes = {MBK_SEARCH_OPTIONS: {newValue:{}, oldValue:{}}
+		console.log(changes);
 		if(changes[LOCAL_STORAGE_KEY]){
 			const {address, maxResult, minWord, delay, timeout} = changes[LOCAL_STORAGE_KEY].newValue;
 			CONSTANTS.address = address;
@@ -66,7 +67,7 @@
 			// var data = $(selector).val(); 
 			// remove empty space of string expecially on starting position
 			var data = $(selector).val().replace(/^\s+/, ""); 
-			console.log(data.length)
+			// console.log(data.length)
 			// if data.length < CONSTANTS.minWord pass
 			if(data.length < CONSTANTS.minWord){
 				// response([{label:null, value:null, artistName:null, songName:null}]);
@@ -74,6 +75,7 @@
 				timer.end();
 				return;
 			} 
+			$('#titleDiv').text('검색중...');
 			for ( var i = 0 ; i < data.length ; i++ ) {
 				if(Hangul.isHangul(data[i])){
 					debugLog.log('이건 초성검색이 아닙니다');
@@ -96,13 +98,13 @@
 				'type':'GET',
 				'timeout': CONSTANTS.timeout,
 				'success': function(res){
-					const {result,count} = res;
+					const {result,count = 0} = res;
 					const elapsed = timer.end();
 					$('#titleDiv').text('결과 : '+ count + '건, 시간 : ' + elapsed + '초');
 					// debugLog.log(result)
 					try {
+						if(!Array.isArray(result)) throw 'Result not Array';
 						response(
-							// $.map(result.slice(0,20),function(item){
 							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
 								return {
 									label : item.artistName + ' : '+ item.songName,
@@ -114,12 +116,14 @@
 
 						);		
 					} catch (err) {
+						$('#titleDiv').text('서버 오류');
 						console.log(err);
-						response([{label:null, value:null, artistName:null, songName:null}]);
+						response();
 					}	
 				},
 				'error': (xhrObj, errString, errStatus) => {
 					console.log(errString);
+					$('#titleDiv').text('서버 오류');
 					response();
 				}	 	
 				
