@@ -102,14 +102,14 @@
 					const elapsed = timer.end();
 					const elapsedToFixed = elapsed.toFixed ? elapsed.toFixed(3) : parseFloat(elapsed).toFixed(3);
 					const countPerTotal = count > CONSTANTS.maxResult ? `${CONSTANTS.maxResult}/${count}` : `${count}/${count}`
-					$('#titleDiv').text('결과 : '+ countPerTotal + '건, 시간 : ' + elapsedToFixed + '초');
+					$('#titleDiv').text('결과건수 : '+ countPerTotal + ', 시간 : ' + elapsedToFixed + '초');
 					// debugLog.log(result)
 					try {
 						if(!Array.isArray(result)) throw '서버오류';
 						response(
 							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
 								return {
-									label : item.artistName + ' : '+ item.songName,
+									label : item.artistName + ' ^ '+ item.songName,
 									value : item.songName,
 									artistName : item.artistName, 
 									songName :  item.songName,
@@ -125,7 +125,10 @@
 				},
 				'error': (xhrObj, errString, errStatus) => {
 					console.log(errString);
-					$('#titleDiv').text('서버 오류');
+					const stringMap = {
+						'timeout' : '시간초과',
+					}
+					$('#titleDiv').text(stringMap[errString]);
 					response();
 				}	 	
 				
@@ -192,7 +195,7 @@
 		// add content div in container
 		const contentDiv = document.createElement('div');
 		contentDiv.setAttribute('id', 'searchResult');
-		contentDiv.setAttribute("style", "background-color: black;color: white;font-size: small;display:flex;flex-direction:column;");
+		contentDiv.setAttribute("style", "background-color: tomato;color: white;font-size: small;display:flex;flex-direction:column;");
 		containerDiv.appendChild(contentDiv);
 		
 		// add title div in content
@@ -206,6 +209,7 @@
 		searchInput.setAttribute('id', 'autoSearchInput');
 		searchInput.setAttribute('type', 'text');
 		searchInput.setAttribute('onClick', 'this.select();');
+		searchInput.setAttribute('style', 'font-family: Verdana, Arial, sans-serif;font-size: 12px;')
 		contentDiv.appendChild(searchInput);
 	
 		// add move div in container
