@@ -100,10 +100,12 @@
 				'success': function(res){
 					const {result,count = 0} = res;
 					const elapsed = timer.end();
-					$('#titleDiv').text('결과 : '+ count + '건, 시간 : ' + elapsed + '초');
+					const elapsedToFixed = elapsed.toFixed ? elapsed.toFixed(3) : parseFloat(elapsed).toFixed(3);
+					const countPerTotal = count > CONSTANTS.maxResult ? `${CONSTANTS.maxResult}/${count}` : `${count}/${count}`
+					$('#titleDiv').text('결과 : '+ countPerTotal + '건, 시간 : ' + elapsedToFixed + '초');
 					// debugLog.log(result)
 					try {
-						if(!Array.isArray(result)) throw 'Result not Array';
+						if(!Array.isArray(result)) throw '서버오류';
 						response(
 							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
 								return {
@@ -116,7 +118,7 @@
 
 						);		
 					} catch (err) {
-						$('#titleDiv').text('서버 오류');
+						$('#titleDiv').text(err);
 						console.log(err);
 						response();
 					}	
