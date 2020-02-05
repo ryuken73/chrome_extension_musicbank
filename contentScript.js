@@ -67,7 +67,7 @@
 			const timer = new Timer();
 			timer.start();
 			// remove empty space of string expecially on starting position
-			var data = $(selector).val().replace(/^\s+/, ""); 
+			const data = $(selector).val().replace(/^\s+/, ""); 
 			// if data.length < CONSTANTS.minWord pass
 			if(data.length < CONSTANTS.minWord){
 				// response([{label:null, value:null, artistName:null, songName:null}]);
@@ -96,7 +96,7 @@
 										getElementById('topGnbWrap').lastElementChild.lastElementChild.
 										children[0].innerText 
 										: userId;
-				console.log(userId);
+				// console.log(userId);
 			} catch(err) {
 				console.log(err);
 				userId = 'none';
@@ -119,10 +119,13 @@
 						response(
 							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
 								return {
-									label : item.artistName + ' ^ '+ item.songName,
-									value : item.songName,
+									label : item.artistName + ' ^ '+ item.songName + ' / ' + item.year || '-',
+									value : item.artistName + ' ^ '+ item.songName,
+									// value : item.songName,
+									// value : data,
 									artistName : item.artistName, 
 									songName :  item.songName,
+									label_no : item.label
 								};							
 							})
 
@@ -159,7 +162,11 @@
 
 				// So, instead of using all_frame, elements in iframe can be accessed contents() api in jQuery	
 				// like const selector = $('#topFrame').contents().find('#sch_search_text');
-				$('#topFrame').contents().find('#sch_search_text').val(ui.item.songName);
+				// $('#topFrame').contents().find('#sch_search_text').val(ui.item.songName);
+				$('this').text = ui.item.value;
+				const {label_no, artistName, songName} = ui.item;
+				const searchValue = label_no || `${artistName} ${songName}`;
+				$('#topFrame').contents().find('#sch_search_text').val(searchValue);
 				$('#topFrame').contents().find('#sch_search_text').next().trigger('click');
 			});
 		},
