@@ -47,7 +47,7 @@
 		// changes = {MBK_SEARCH_OPTIONS: {newValue:{}, oldValue:{}}
 		console.log(changes);
 		if(changes[LOCAL_STORAGE_KEY]){
-			const {address, maxResult, minWord, delay, timeout} = changes[LOCAL_STORAGE_KEY].newValue;
+			const {address, maxResult, minWord, delay, timeout, supportThreeWords} = changes[LOCAL_STORAGE_KEY].newValue;
 			CONSTANTS.address = address;
 			CONSTANTS.maxResult = maxResult;
 			CONSTANTS.minWord = minWord;
@@ -103,10 +103,11 @@
 				console.log(err);
 				userId = 'none';
 			}
-
+			let searchUrl = CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term) + '?userId=' + userId;
+			searchUrl = CONSTANTS.supportThreeWords ? searchUrl + '&supportThreeWords=true': searchUrl;
 			$.ajax({
 				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
-				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term) + '?userId=' + userId,
+				'url': searchUrl,
 				'type':'GET',
 				'timeout': CONSTANTS.timeout,
 				'success': function(res){
@@ -120,9 +121,11 @@
 						if(!Array.isArray(result)) throw '서버오류';
 						response(
 							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
+								const normalLabel = item.artistName + ' : ' + item.songName;
+								const normalValue = item.artistName + ' : ' + item.songName;
 								return {
-									label : item.artistName + ' ^ '+ item.songName + ' / ' + item.year || '-',
-									value : item.artistName + ' ^ '+ item.songName,
+									label : CONSTANTS.supportThreeWords ? normalLabel : item.artistName + ' ^ '+ item.songName,
+									value : CONSTANTS.supportThreeWords ? normalValue : item.artistName + ' ^ '+ item.songName,
 									// value : item.songName,
 									// value : data,
 									artistName : item.artistName, 
@@ -167,7 +170,8 @@
 				// $('#topFrame').contents().find('#sch_search_text').val(ui.item.songName);
 				$('this').text = ui.item.value;
 				const {label_no, artistName, songName} = ui.item;
-				const searchValue = label_no || `${artistName} ${songName}`;
+				// const searchValue = label_no || `${artistName} ${songName}`;
+				const searchValue = `${artistName} ${songName}`;
 				$('#topFrame').contents().find('#sch_search_text').val(searchValue);
 				$('#topFrame').contents().find('#sch_search_text').next().trigger('click');
 			});

@@ -1,6 +1,6 @@
-chrome.webNavigation.onCompleted.addListener(function(details) {
-    const {tabId,url} = details
-}, {url: [{urlMatches : 'http://musicbank.sbs.co.kr/'}]});
+// chrome.webNavigation.onCompleted.addListener(function(details) {
+//     const {tabId,url} = details
+// }, {url: [{urlMatches : 'http://musicbank.sbs.co.kr/'}]});
 
 // when browser connects wise.sbs.co.kr, popup.html activate
 chrome.runtime.onInstalled.addListener(function() {
