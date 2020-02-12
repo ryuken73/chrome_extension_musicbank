@@ -2,6 +2,8 @@
 import React, {useState, useEffect} from 'react';
 import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
@@ -23,6 +25,11 @@ const useStyle = makeStyles({
     submitBtns : {
         backgroundColor: grey[700],
         color: "white"
+    },
+    checkSupportThree : {
+      backgroundColor: grey[800],
+      display : 'flex',
+      alignContent : 'center'
     }
 })
 
@@ -35,13 +42,14 @@ function Main() {
     minWord : 2,
     delay : 500,
     timeout : 5000,
+    supportThreeWords : true
   }
   const LOCAL_STORAGE_KEY = 'MBK_SEARCH_OPTIONS';
   const [options, setOptions] = useState(defaults);
   const [message, setMessage] = useState('');
   console.log('re-rendering!!')
-  const {address, maxResult, minWord, delay, timeout} = options;
-  console.log(address,maxResult,minWord,delay, timeout);
+  const {address, maxResult, minWord, delay, timeout, supportThreeWords} = options;
+  console.log(address,maxResult,minWord,delay, timeout, supportThreeWords);
 
   const fakeStorage = new Map();
 
@@ -99,6 +107,11 @@ function Main() {
     window.close();
   }
 
+  const handleChangeCheckSupport = (event) => {
+    console.log(event.target.checked);
+    const newOptions = {...options, 'supportThreeWords':!supportThreeWords};
+    setOptions(newOptions);
+  }
 
   return (
       <Container maxWidth="sm">
@@ -118,6 +131,14 @@ function Main() {
         <Box p={1} className={classes.textBox}>
             <TextField value={delay} margin='dense' onChange={handleChangeValue('delay')} label="자동완성 지연(ms)"/>
             <TextField value={timeout} margin='dense' onChange={handleChangeValue('timeout')} label="자동완성 시간초과(ms)"/>
+        </Box>
+        <Box p={1} className={classes.checkSupportThree}>
+          <Checkbox checked={supportThreeWords} 
+              onChange={handleChangeCheckSupport}
+              color="primary"
+              inputProps={{ 'aria-label': 'primary checkbox' }}
+          />
+          <Typography style={{margin: '0.8em', color: 'white'}} variant="body2">세단어 이상 검색 활성화</Typography>
         </Box>
         <Box p={1} className={classes.submitBtns}>
             <Button variant="contained" onClick={handleSaveClick}>저장</Button>

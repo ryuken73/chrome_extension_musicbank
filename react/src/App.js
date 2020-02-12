@@ -43,6 +43,14 @@ function App() {
               borderBottom : '2px solid black'
             }
           }
+        },
+        MuiCheckbox: {
+          colorPrimary : {
+            color : 'white',
+            '&$checked' : {
+              color : 'white'
+            }
+          }
         }
       }
   })

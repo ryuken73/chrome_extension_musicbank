@@ -19,7 +19,8 @@
 	const DEFAULT_CONSTANTS = {
 		address : 'https://10.10.16.122:3000',
 		maxResult : 100,
-		minWord : 2
+		minWord : 2,
+		supportThreeWords : true
 	};
 	const CONSTANTS = await getLocalStorage(LOCAL_STORAGE_KEY) || DEFAULT_CONSTANTS;
 	console.log(CONSTANTS);
@@ -50,7 +51,8 @@
 			CONSTANTS.maxResult = maxResult;
 			CONSTANTS.minWord = minWord;
 			CONSTANTS.delay = delay;
-			CONSTANTS.timeout = timeout;			
+			CONSTANTS.timeout = timeout;
+			CONSTANTS.supportThreeWords = supportThreeWords; 			
 			console.log('CONSTANT changed : ', CONSTANTS)
 
 			// dynamically change autocomplete delay value
