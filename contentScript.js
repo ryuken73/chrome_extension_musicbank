@@ -17,7 +17,7 @@
 	// initialize constant from chrome.storage.local API
 	const LOCAL_STORAGE_KEY = 'MBK_SEARCH_OPTIONS';
 	const DEFAULT_CONSTANTS = {
-		address : 'https://10.10.16.122:3000',
+		address : 'http://10.10.16.122:3000',
 		maxResult : 100,
 		minWord : 2,
 		supportThreeWords : true
@@ -45,6 +45,7 @@
 	chrome.storage.onChanged.addListener((changes, namespace) => {
 		// namespaces = local or sync ()
 		// changes = {MBK_SEARCH_OPTIONS: {newValue:{}, oldValue:{}}
+		console.log(changes);
 		if(changes[LOCAL_STORAGE_KEY]){
 			const {address, maxResult, minWord, delay, timeout} = changes[LOCAL_STORAGE_KEY].newValue;
 			CONSTANTS.address = address;
@@ -60,15 +61,15 @@
 		}
 	});
 
+	let userId = null;
+
 	$(selector).autocomplete({
 		delay: CONSTANTS.delay,
 		source: function(request,response){
 			const timer = new Timer();
 			timer.start();
-			// var data = $(selector).val(); 
 			// remove empty space of string expecially on starting position
-			var data = $(selector).val().replace(/^\s+/, ""); 
-			console.log(data.length)
+			const data = $(selector).val().replace(/^\s+/, ""); 
 			// if data.length < CONSTANTS.minWord pass
 			if(data.length < CONSTANTS.minWord){
 				// response([{label:null, value:null, artistName:null, songName:null}]);
@@ -76,6 +77,7 @@
 				timer.end();
 				return;
 			} 
+			$('#titleDiv').text('검색중...');
 			for ( var i = 0 ; i < data.length ; i++ ) {
 				if(Hangul.isHangul(data[i])){
 					debugLog.log('이건 초성검색이 아닙니다');
@@ -91,37 +93,57 @@
 					}
 				}
 			}
-			
+			try {
+				userId = userId === null ? document.getElementById('topFrame').contentWindow.document.
+										getElementById('topGnbWrap').lastElementChild.lastElementChild.
+										children[0].innerText 
+										: userId;
+				// console.log(userId);
+			} catch(err) {
+				console.log(err);
+				userId = 'none';
+			}
+
 			$.ajax({
 				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
-				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term),
+				'url': CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term) + '?userId=' + userId,
 				'type':'GET',
 				'timeout': CONSTANTS.timeout,
 				'success': function(res){
-					const {result,count} = res;
+					const {result,count = 0} = res;
 					const elapsed = timer.end();
-					$('#titleDiv').text('결과 : '+ count + '건, 시간 : ' + elapsed + '초');
+					const elapsedToFixed = elapsed.toFixed ? elapsed.toFixed(3) : parseFloat(elapsed).toFixed(3);
+					const countPerTotal = count > CONSTANTS.maxResult ? `${CONSTANTS.maxResult}/${count}` : `${count}/${count}`
+					$('#titleDiv').text('결과건수 : '+ countPerTotal + ', 시간 : ' + elapsedToFixed + '초');
 					// debugLog.log(result)
 					try {
+						if(!Array.isArray(result)) throw '서버오류';
 						response(
-							// $.map(result.slice(0,20),function(item){
 							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
 								return {
-									label : item.artistName + ' : '+ item.songName,
-									value : item.songName,
+									label : item.artistName + ' ^ '+ item.songName + ' / ' + item.year || '-',
+									value : item.artistName + ' ^ '+ item.songName,
+									// value : item.songName,
+									// value : data,
 									artistName : item.artistName, 
 									songName :  item.songName,
+									label_no : item.label
 								};							
 							})
 
 						);		
 					} catch (err) {
+						$('#titleDiv').text(err);
 						console.log(err);
-						response([{label:null, value:null, artistName:null, songName:null}]);
+						response();
 					}	
 				},
 				'error': (xhrObj, errString, errStatus) => {
 					console.log(errString);
+					const stringMap = {
+						'timeout' : '시간초과',
+					}
+					$('#titleDiv').text(stringMap[errString]);
 					response();
 				}	 	
 				
@@ -142,7 +164,11 @@
 
 				// So, instead of using all_frame, elements in iframe can be accessed contents() api in jQuery	
 				// like const selector = $('#topFrame').contents().find('#sch_search_text');
-				$('#topFrame').contents().find('#sch_search_text').val(ui.item.songName);
+				// $('#topFrame').contents().find('#sch_search_text').val(ui.item.songName);
+				$('this').text = ui.item.value;
+				const {label_no, artistName, songName} = ui.item;
+				const searchValue = label_no || `${artistName} ${songName}`;
+				$('#topFrame').contents().find('#sch_search_text').val(searchValue);
 				$('#topFrame').contents().find('#sch_search_text').next().trigger('click');
 			});
 		},
@@ -188,7 +214,7 @@
 		// add content div in container
 		const contentDiv = document.createElement('div');
 		contentDiv.setAttribute('id', 'searchResult');
-		contentDiv.setAttribute("style", "background-color: black;color: white;font-size: small;display:flex;flex-direction:column;");
+		contentDiv.setAttribute("style", "background-color: tomato;color: white;font-size: small;display:flex;flex-direction:column;");
 		containerDiv.appendChild(contentDiv);
 		
 		// add title div in content
@@ -202,6 +228,7 @@
 		searchInput.setAttribute('id', 'autoSearchInput');
 		searchInput.setAttribute('type', 'text');
 		searchInput.setAttribute('onClick', 'this.select();');
+		searchInput.setAttribute('style', 'font-family: Verdana, Arial, sans-serif;font-size: 12px;')
 		contentDiv.appendChild(searchInput);
 	
 		// add move div in container

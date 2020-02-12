@@ -1,6 +1,6 @@
 {
     "name": "SBS Musicbank autocomplete plugin",
-    "version": "1.03",
+    "version": "1.5",
     "description": "SBS musicbank search helper - auto complete and suggestion",
     "manifest_version": 2,
     "permissions": [
