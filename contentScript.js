@@ -121,8 +121,8 @@
 						if(!Array.isArray(result)) throw '서버오류';
 						response(
 							$.map(result.slice(0,CONSTANTS.maxResult), function(item){	
-								const normalLabel = item.artistName + ' : ' + item.songName;
-								const normalValue = item.artistName + ' : ' + item.songName;
+								const normalLabel = item.artistName + ' : ' + item.songName; // display in suggestion list
+								const normalValue = item.artistName + ' ' + item.songName; 
 								return {
 									label : CONSTANTS.supportThreeWords ? normalLabel : item.artistName + ' ^ '+ item.songName,
 									value : CONSTANTS.supportThreeWords ? normalValue : item.artistName + ' ^ '+ item.songName,
