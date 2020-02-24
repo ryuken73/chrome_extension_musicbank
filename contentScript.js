@@ -188,13 +188,14 @@
 				.each(function () {
 					var me = $(this);
 					var keywords = acData.term.split(' ').join('|');
+
 					me.html(me.text().replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>'));
 				});
 			} catch (err) {
 				console.log(err);
-			}		
+			}				
 		} 
-	});	
+	});
 
 	// start : utility functions (makeUI, getDrag etc...)
 

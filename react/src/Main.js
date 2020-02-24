@@ -41,7 +41,7 @@ function Main() {
     address : 'http://10.10.16.122:3000',
     maxResult : 500,
     minWord : 2,
-    delay : 500,
+    delay : 250,
     timeout : 5000,
     supportThreeWords : true
   }
