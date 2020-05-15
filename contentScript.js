@@ -105,8 +105,8 @@
 			}
 			let searchUrl = CONSTANTS.address + '/searchSong/withWorkers/' + encodeURIComponent(request.term) + '?userId=' + userId;
 			searchUrl = CONSTANTS.supportThreeWords ? searchUrl + '&supportThreeWords=true': searchUrl;
+			searchUrl = CONSTANTS.maxResult ? searchUrl + `&count=${CONSTANTS.maxResult}` : searchUrl;
 			$.ajax({
-				// 'url':'/searchSong/withWorkers/'+encodeURIComponent(request.term),
 				'url': searchUrl,
 				'type':'GET',
 				'timeout': CONSTANTS.timeout,
@@ -145,6 +145,7 @@
 					console.log(errString);
 					const stringMap = {
 						'timeout' : '시간초과',
+						'error' : '접속오류'
 					}
 					$('#titleDiv').text(stringMap[errString]);
 					response();
@@ -187,13 +188,14 @@
 				.each(function () {
 					var me = $(this);
 					var keywords = acData.term.split(' ').join('|');
+
 					me.html(me.text().replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>'));
 				});
 			} catch (err) {
 				console.log(err);
-			}		
+			}				
 		} 
-	});	
+	});
 
 	// start : utility functions (makeUI, getDrag etc...)
 

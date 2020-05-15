@@ -41,7 +41,7 @@ function Main() {
     address : 'http://10.11.32.52:3010',
     maxResult : 500,
     minWord : 2,
-    delay : 500,
+    delay : 100,
     timeout : 5000,
     supportThreeWords : true
   }
@@ -92,6 +92,7 @@ function Main() {
       console.log(`save localStorage[${LOCAL_STORAGE_KEY}] = `, options);
       console.log(chrome.runtime.lastError);
       setMessage('저장되었습니다.');
+      setTimeout(() => window.close(), 1000);
     });
   }
 
