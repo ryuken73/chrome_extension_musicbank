@@ -17,7 +17,7 @@
 	// initialize constant from chrome.storage.local API
 	const LOCAL_STORAGE_KEY = 'MBK_SEARCH_OPTIONS';
 	const DEFAULT_CONSTANTS = {
-		address : 'http://10.10.16.122:3000',
+		address : 'http://10.11.32.52:3010',
 		maxResult : 100,
 		minWord : 2,
 		supportThreeWords : true

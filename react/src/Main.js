@@ -38,7 +38,7 @@ function Main() {
 
   const classes = useStyle();
   const defaults = {
-    address : 'http://10.10.16.122:3000',
+    address : 'http://10.11.32.52:3010',
     maxResult : 500,
     minWord : 2,
     delay : 500,
@@ -101,6 +101,9 @@ function Main() {
       console.log(`save localStorage[${LOCAL_STORAGE_KEY}] = `, options);
       console.log(chrome.runtime.lastError);
       setMessage('초기화되었습니다.');
+      setTimeout(() => {
+        window.close();
+      }, 2000);
     });
   }
 
