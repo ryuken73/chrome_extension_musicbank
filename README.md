@@ -12,7 +12,7 @@ https://chrome.google.com/webstore/detail/sbs-musicbank-autocomplet/kimhlfdpjjhm
 - musicbank.sbs.co.kr 방문
 - 크롬브라우저 우상단의 아이콘 클릭
 - 옵션설명
-![Alt Text](https://github.com/ryuken73/node_chosung_search/raw/master/node_hangul/image/init.jpg)
+![Alt Text](https://github.com/ryuken73/chrome_extension_musicbank/blob/master/out-dist/musicbank_autocomplete_options.png)
   주소 : * 변경 시 관리자에게 문의   
   최대 결과갯수 : 검색결과 표시 갯수 (디폴트: 500)
   검색요청 최소단어수 : 자동완성 요청을 위한 최소 단어수 (디폴트: 2)     
