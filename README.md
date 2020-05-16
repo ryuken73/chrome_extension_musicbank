@@ -6,7 +6,7 @@ https://chrome.google.com/webstore/detail/sbs-musicbank-autocomplet/kimhlfdpjjhm
 
 # 사용방법
 ## 사용조건
-- http://musicbank.sbs.co.kr에서만 동작
+- http://musicbank.sbs.co.kr에서 동작
 
 ## 환경설정
 - musicbank.sbs.co.kr 방문
@@ -14,12 +14,12 @@ https://chrome.google.com/webstore/detail/sbs-musicbank-autocomplet/kimhlfdpjjhm
 - 옵션설명  
 ![Alt Text](https://github.com/ryuken73/chrome_extension_musicbank/blob/master/out-dist/musicbank_autocomplete_options.png)  
 
-  주소 : * 변경 시 관리자에게 문의   
-  최대 결과갯수 : 검색결과 표시 갯수 (디폴트: 500)  
+  주소 : 자동완성 결과요청 서버주소 (* 변경 시 관리자에게 문의)   
+  검색결과 최대수 : 검색결과 최대 표시 갯수 (디폴트: 500)  
   검색요청 최소단어수 : 자동완성 요청을 위한 최소 단어수 (디폴트: 2)     
   자동완성 지연 : 단어입력 후 자동완성 요청까지의 지연시간(디폴트 : 200ms)  
-  자동완성 시관초과 : 서버 응답 시간초과  
-  세 단어 이상 검색활성화 : 향상된 검색기능   
+  자동완성 시관초과 : 서버 요청 시간초과  
+  세 단어 이상 검색활성화 : 향상된 검색기능 사용  
 
 
 # 사용문의
