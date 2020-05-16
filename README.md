@@ -11,14 +11,15 @@ https://chrome.google.com/webstore/detail/sbs-musicbank-autocomplet/kimhlfdpjjhm
 ## 환경설정
 - musicbank.sbs.co.kr 방문
 - 크롬브라우저 우상단의 아이콘 클릭
-- 옵션설명
-![Alt Text](https://github.com/ryuken73/chrome_extension_musicbank/blob/master/out-dist/musicbank_autocomplete_options.png)
+- 옵션설명  
+![Alt Text](https://github.com/ryuken73/chrome_extension_musicbank/blob/master/out-dist/musicbank_autocomplete_options.png)  
+
   주소 : * 변경 시 관리자에게 문의   
-  최대 결과갯수 : 검색결과 표시 갯수 (디폴트: 500)
+  최대 결과갯수 : 검색결과 표시 갯수 (디폴트: 500)  
   검색요청 최소단어수 : 자동완성 요청을 위한 최소 단어수 (디폴트: 2)     
   자동완성 지연 : 단어입력 후 자동완성 요청까지의 지연시간(디폴트 : 200ms)  
   자동완성 시관초과 : 서버 응답 시간초과  
-  세단어 이상 검색활성화 : 향상된 검색기능   
+  세 단어 이상 검색활성화 : 향상된 검색기능   
 
 
 # 사용문의
